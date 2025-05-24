@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Withdraw</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #fff;
+      margin: 0;
+      padding: 0;
+      color: #000;
+      -webkit-font-smoothing: antialiased;
+      -webkit-text-size-adjust: 100%;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      padding: 15px 20px;
+      font-size: 18px;
+      font-weight: bold;
+      border-bottom: 1px solid #ddd;
+    }
+    .header span:first-child {
+      margin-right: 10px;
+      font-size: 20px;
+    }
+    .container {
+      padding: 20px 20px 10px;
+    }
+    .section-title {
+      font-weight: bold;
+      font-size: 15px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .section-title span {
+      color: #ff2c55;
+      font-size: 14px;
+    }
+    .paypal-box {
+      border: 1px solid #eee;
+      padding: 15px 12px;
+      border-radius: 10px;
+    }
+    .paypal-box img {
+      width: 40px;
+      vertical-align: middle;
+    }
+    .paypal-info {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .paypal-box small {
+      display: block;
+      margin-top: 8px;
+      color: gray;
+      font-size: 12px;
+    }
+    .withdraw-box {
+      margin-top: 20px;
+      border: 1px solid #eee;
+      border-radius: 10px;
+      padding: 15px 12px;
+    }
+    .withdraw-limit {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      margin-bottom: 10px;
+      color: #555;
+    }
+    .withdraw-label {
+      margin-bottom: 5px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .usd-box, .username-box {
+      position: relative;
+      background: #f8f8f8;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+    .usd-box input, .username-box input {
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  font-weight: bold; /* ✅ Add this line */
+  width: 100%;
+  outline: none;
+  color: #000;
+}
+    .usd-box .all {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #ff2c55;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .estimated-amount {
+      font-size: 14px;
+      margin-top: 20px;
+    }
+    .estimated-amount-value {
+      font-size: 22px;
+      margin-top: 5px;
+    }
+    .withdraw-button {
+      width: 100%;
+      padding: 14px;
+      background: #eee;
+      color: #aaa;
+      border: none;
+      border-radius: 10px;
+      margin-top: 20px;
+      font-size: 16px;
+    }
+    .withdraw-button.active {
+      background: #ff2c55;
+      color: #fff;
+    }
+    .footer {
+      margin-top: 30px;
+      font-size: 12px;
+      text-align: center;
+      color: #888;
+      padding: 0 20px 30px;
+    }
+    @media (max-width: 480px) {
+      .usd-box {
+        padding-right: 50px;
+      }
+      .paypal-info {
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+      }
+    }
+  </style>
+  <style>
+    .spinner {
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #ff2c55;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1000;
+    }
+  
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+  
+    .modal-content {
+      background-color: #fff;
+      margin: auto;
+      margin-top: 20%;
+      padding: 20px 30px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+  
+    .modal-content .tick {
+      font-size: 40px;
+      color: #4BB543;
+      margin-bottom: 10px;
+    }
+  
+    .summary {
+      font-size: 14px;
+      margin-top: 10px;
+      color: #444;
+    }
+  
+    .back-btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: transparent;
+      color: #ff2c55;
+      border: 2px solid #ff2c55;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  
+    .back-btn:hover {
+      background-color: #ff2c55;
+      color: #fff;
+    }
+  </style>
+  
+</head>
+<body>
+    <div class="header">
+      <span>&larr;</span>
+      <span>Withdraw</span>
+    </div>
+  
+    <div class="container">
+      <div class="section-title">
+        <span>Payment method</span>
+        <span>Manage</span>
+      </div>
+      <div class="paypal-box">
+        <div class="paypal-info">
+          <img src="https://www.paypalobjects.com/webstatic/icon/pp258.png" alt="PayPal">
+          <span>PayPal (ura******222@gm...)</span>
+        </div>
+        <small>Minimum withdrawal amount is USD 1</small>
+      </div>
+  
+      <div class="withdraw-box">
+        <div class="withdraw-limit">
+          <span>Daily withdrawal limit (Remain/Total)</span>
+          <span>$100 / $100</span>
+        </div>
+        <div class="withdraw-label">Withdrawal amount</div>
+        <div class="usd-box">
+          <input id="amount" inputmode="decimal" pattern="[0-9]*" type="number" min="0.01" max="100" step="0.01" placeholder="USD Available today: 0.08" />
+          <div class="all" onclick="document.getElementById('amount').value = '0.08'; checkInputs();">All</div>
+        </div>
+  
+        <div class="withdraw-label">Username</div>
+        <div class="username-box">
+          <input id="username" type="text" placeholder="Enter your username" oninput="checkInputs()" />
+        </div>
+  
+        <div class="estimated-amount">Estimated amount you receive</div>
+        <div class="estimated-amount-value">-</div>
+      </div>
+  
+      <button id="withdrawBtn" class="withdraw-button" disabled onclick="submitWithdraw()">Withdraw</button>
+  
+      <div class="footer">
+        TikTok Terms of Service and Privacy Policy. Payment transactions are<br>
+        processed by PIPO. <strong>PIPO Privacy Policy</strong>
+      </div>
+    </div>
+  
+    <!-- Loading Spinner -->
+    <div id="loading" class="spinner" style="display:none;"></div>
+  
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+      <div class="modal-content">
+        <div class="tick">&#10004;</div>
+        <h3>Withdrawal Successful</h3>
+        <p><strong>Username:</strong> <span id="confirmUsername"></span></p>
+        <p><strong>Amount Sent:</strong> <span id="confirmAmount"></span> USD</p>
+        <div class="summary">Your withdrawal request has been processed successfully. Please check your PayPal account for confirmation. Thank you for using our service.</div>
+      </div>
+    </div>
+  
+    <style>
+      .usd-box input,
+      .username-box input {
+        font-weight: bold;
+      }
+  
+      .spinner {
+        border: 6px solid #f3f3f3;
+        border-top: 6px solid #ff2c55;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1000;
+      }
+  
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+  
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+      }
+  
+      .modal-content {
+        background-color: #fff;
+        margin: 20% auto;
+        padding: 20px;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 400px;
+        text-align: center;
+      }
+  
+      .modal-content .tick {
+        font-size: 40px;
+        color: #4BB543;
+        margin-bottom: 10px;
+      }
+  
+      .summary {
+        font-size: 14px;
+        margin-top: 10px;
+        color: #444;
+      }
+    </style>
+  
+  <script>
+    function checkInputs() {
+      const username = document.getElementById('username').value.trim();
+      const amount = parseFloat(document.getElementById('amount').value);
+      const button = document.getElementById('withdrawBtn');
+  
+      if (username && amount > 0) {
+        button.disabled = false;
+        button.classList.add('active');
+      } else {
+        button.disabled = true;
+        button.classList.remove('active');
+      }
+    }
+  
+    function submitWithdraw() {
+      const username = document.getElementById('username').value.trim();
+      const amount = parseFloat(document.getElementById('amount').value).toFixed(2);
+  
+      if (!username || amount <= 0) return;
+  
+      document.getElementById('loading').style.display = 'block';
+  
+      setTimeout(() => {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('confirmUsername').innerText = username;
+        document.getElementById('confirmAmount').innerText = amount;
+        document.getElementById('successModal').style.display = 'block';
+      }, 2000);
+    }
+  
+    function goBack() {
+      document.getElementById('successModal').style.display = 'none';
+      document.getElementById('username').value = '';
+      document.getElementById('amount').value = '';
+      checkInputs();
+    }
+  
+    window.onclick = function(event) {
+      const modal = document.getElementById('successModal');
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+  </script>
+  
+    <!-- Loading Spinner -->
+<div id="loading" class="spinner" style="display:none;"></div>
+
+<!-- Success Modal -->
+<div id="successModal" class="modal">
+  <div class="modal-content">
+    <div class="tick">&#10004;</div>
+    <h3>Withdrawal Successful</h3>
+    <p><strong>Username:</strong> <span id="confirmUsername"></span></p>
+    <p><strong>Amount Sent:</strong> <span id="confirmAmount"></span> USD</p>
+    <div class="summary">Your withdrawal request has been processed successfully. Please check your PayPal account for confirmation. Thank you for using our service.</div>
+    <button class="back-btn" onclick="goBack()">Go Back</button>
+  </div>
+</div>
+
+  </body>
+  
+</html>
+
